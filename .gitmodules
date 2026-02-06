@@ -1,0 +1,3 @@
+[submodule "lc0-2"]
+	path = lc0-2
+	url = git@github.com:LeelaChessZero/lc0.git

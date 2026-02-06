@@ -21,6 +21,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
+from tqdm import tqdm
 import chess
 
 # Add lc0 directory to path
@@ -451,6 +452,8 @@ class ContrastiveTrainer:
         step = 0
         accumulated = {'loss': 0, 'acc_p2t': 0, 'acc_t2p': 0}
 
+        pbar = tqdm(total=self.config.max_steps, desc="Contrastive Pre-training", unit="step")
+
         while step < self.config.max_steps:
             for batch in self.dataloader:
                 # Forward
@@ -473,6 +476,7 @@ class ContrastiveTrainer:
                 accumulated['acc_t2p'] += loss_dict['acc_t2p'].item()
 
                 step += 1
+                pbar.update(1)
 
                 # Log
                 if step % self.config.log_interval == 0:
@@ -482,12 +486,12 @@ class ContrastiveTrainer:
                     lr = self.scheduler.get_last_lr()[0]
                     temp = loss_dict['temperature']
 
-                    print(f"Step {step}/{self.config.max_steps} | "
-                          f"Loss: {avg_loss:.4f} | "
-                          f"Acc P2T: {avg_p2t:.3f} | "
-                          f"Acc T2P: {avg_t2p:.3f} | "
-                          f"Temp: {temp:.3f} | "
-                          f"LR: {lr:.2e}")
+                    pbar.set_postfix(
+                        loss=f"{avg_loss:.4f}",
+                        p2t=f"{avg_p2t:.3f}",
+                        t2p=f"{avg_t2p:.3f}",
+                        lr=f"{lr:.2e}"
+                    )
 
                     accumulated = {'loss': 0, 'acc_p2t': 0, 'acc_t2p': 0}
 
@@ -497,6 +501,8 @@ class ContrastiveTrainer:
 
                 if step >= self.config.max_steps:
                     break
+
+        pbar.close()
 
         self.save_checkpoint(step, final=True)
         print("\nContrastive pre-training complete!")

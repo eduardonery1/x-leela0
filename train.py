@@ -33,7 +33,7 @@ from pretrain_contrastive import ContrastiveConfig  # For loading pretrain check
 class TrainingConfig:
     """Training configuration."""
     # Data
-    data_cache: str = "/home/nery/Projects/chess/data/cache.json"
+    data_cache: str = str(Path(__file__).parent / "data" / "cache.json")
     max_comment_length: int = 128
 
     # Model

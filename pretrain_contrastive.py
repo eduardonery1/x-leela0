@@ -35,7 +35,7 @@ from lc0_pytorch import create_lc0_model, encode_position
 class ContrastiveConfig:
     """Contrastive pre-training configuration."""
     # Data
-    data_cache: str = "/home/nery/Projects/chess/data/cache.json"
+    data_cache: str = str(Path(__file__).parent / "data" / "cache.json")
     max_comment_length: int = 128
 
     # Model
